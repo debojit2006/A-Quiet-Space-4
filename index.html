@@ -18,14 +18,55 @@
 
                 <div id="feature-display-area" class="feature-display-area">
                     <div id="initial-message" class="initial-message">
-                        Choose an activity or an environment to find your peace
+                        Choose an activity to find your peace
                     </div>
 
-                    <div id="breathing-feature" class="feature-container hidden"></div>
+                    <div id="breathing-feature" class="hidden">
+                        <div class="breathing-circle-container">
+                             <div id="breathing-circle"></div>
+                        </div>
+                        <p id="breathing-instructions">Find your rhythm</p>
+                    </div>
 
-                    <div id="kind-words-feature" class="feature-container hidden"></div>
+                    <div id="kind-words-feature" class="hidden">
+                        <div class="quote-display-wrapper">
+                            <span class="quote-mark top">"</span>
+                            <p id="kind-word-text"></p>
+                            <span class="quote-mark bottom">"</span>
+                        </div>
+                        <button id="another-word-btn" class="feature-btn">
+                            <svg class="refresh-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M3 12a9 9 0 0 1 9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>
+                            <span>Another word</span>
+                        </button>
+                    </div>
                     
-                    <div id="focus-timer-feature" class="feature-container hidden"></div>
+                    <div id="focus-timer-feature" class="hidden">
+                        <div id="timer-circle-container">
+                            <svg class="timer-progress-ring" width="256" height="256">
+                                <circle class="timer-progress-ring-bg" stroke="rgba(255, 255, 255, 0.1)" stroke-width="3" fill="transparent" r="120" cx="128" cy="128"/>
+                                <circle id="timer-progress-ring-fg" class="timer-progress-ring-fg" stroke="#fff" stroke-width="4" fill="transparent" r="120" cx="128" cy="128"/>
+                            </svg>
+                            <div id="timer-display">
+                                <div id="timer-time-left">25:00</div>
+                                <div id="timer-mode-status">Ready</div>
+                            </div>
+                        </div>
+                         <div id="timer-controls">
+                            <button id="timer-start-pause-btn" class="feature-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="play-icon"><path d="M6 3v18l15-9-15-9z"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pause-icon hidden"><rect x="14" y="4" width="4" height="16" rx="1"/><rect x="6" y="4" width="4" height="16" rx="1"/></svg>
+                                <span id="timer-start-pause-text">Start</span>
+                            </button>
+                            <button id="timer-reset-btn" class="feature-btn small">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                            </button>
+                        </div>
+                        <div id="timer-mode-switcher">
+                            <button class="mode-btn active" data-mode="work">Work</button>
+                            <button class="mode-btn" data-mode="shortBreak">Short Break</button>
+                            <button class="mode-btn" data-mode="longBreak">Long Break</button>
+                        </div>
+                    </div>
 
                     <div id="environment-instructions" class="environment-instructions hidden">
                         <p id="environment-text"></p>
@@ -33,24 +74,24 @@
                 </div>
 
                 <div class="action-buttons-wrapper">
-                    <div class="action-buttons main-activities">
+                    <div class="action-buttons">
                         <button id="breathe-btn" class="feature-btn lg" data-feature="breathing">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10Z"/><path d="M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z"/></svg>
                             <span>Breathe</span>
                         </button>
                         <button id="words-btn" class="feature-btn lg" data-feature="words">
-                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
-                            <span>Kind Words</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                            <span>Read a kind word</span>
                         </button>
                         <button id="timer-btn" class="feature-btn lg" data-feature="timer">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
                             <span>Focus Timer</span>
                         </button>
                     </div>
 
                     <div class="environment-selection">
                         <p class="env-selection-label">Choose your peaceful environment</p>
-                        <div class="action-buttons environment-grid">
+                        <div class="action-buttons env-grid">
                             <button class="feature-btn" data-environment="sky">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
                                 <span>Night Sky</span>
@@ -68,24 +109,43 @@
                                 <span>Gentle Rain</span>
                             </button>
                             <button class="feature-btn" data-environment="forest">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 10.3c.2-.4.5-.8.9-1a2.4 2.4 0 0 1 2.5 1.3 2.4 2.4 0 0 1-1.3 3.4 2.5 2.5 0 0 1-3.4-1.3 2.4 2.4 0 0 1 .1-2.4Z"/><path d="M14.2 14.2c.4.2.8.5 1 .9a2.4 2.4 0 0 1-1.3 3.4 2.5 2.5 0 0 1-3.4-1.3 2.4 2.4 0 0 1 2.4-.1 2.4 2.4 0 0 1 1.3-2.9Z"/><path d="M12 22v-2"/><path d="M12 6V4"/><path d="m15 9.09 1-1.73"/><path d="m9 15-.9-1.56"/><path d="m20.66 18-1.73-1"/><path d="m3.34 6 1.73 1"/><path d="M18 15.91l1.73 1"/><path d="m6 9-1.73-1"/><path d="M9.09 9 7.36 8"/><path d="m15 15 .9 1.56"/><path d="M6.34 18 4.6 17"/><path d="M17.66 6 15.92 7"/></svg>
+                               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 22v-2.35a1.9 1.9 0 0 1 .5-1.4L15.5 13a1.9 1.9 0 0 0 .5-1.4V4H8v7.6a1.9 1.9 0 0 0 .5 1.4l5 5.35a1.9 1.9 0 0 1 .5 1.4V22Z"/><path d="M18 12h.01"/><path d="M6 12h.01"/></svg>
                                 <span>Forest</span>
                             </button>
-                            <button class="feature-btn" data-environment="fireplace">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12c0-2.8.9-5.3 2.4-7.3"/><path d="M12 12c0 6.4 4.1 10 4.1 10-2.3 0-4.1-3.6-4.1-10Z"/><path d="M12 12c0-6.4-4.1-10-4.1-10 2.3 0 4.1 3.6 4.1 10Z"/><path d="M5 19c0-1.4 1-2.6 2.4-3.1"/><path d="M19 19c0-1.4-1-2.6-2.4-3.1"/></svg>
+                             <button class="feature-btn" data-environment="fireplace">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 20a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2Z"/><path d="M10.5 20a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2Z"/><path d="M19 20a2 2 0 0 0 2-2v-1a2 2 0 0 0-2-2h-1a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h1Z"/><path d="M5 20a2 2 0 0 1-2-2v-1a2 2 0 0 1 2-2h1a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H5Z"/><path d="M12 4a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-0a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/></svg>
                                 <span>Fireplace</span>
                             </button>
                         </div>
                     </div>
                 </div>
+                 <footer>
+                    A Quiet Space for Reflection
+                </footer>
             </div>
         </div>
     </div>
 
-    <div id="wish-prompt" class="wish-modal-wrapper hidden"></div>
+    <div id="wish-prompt" class="wish-modal-wrapper hidden">
+        <div class="wish-modal-content">
+            <div class="wish-icon">🌟</div>
+            <h3>Make a Wish!</h3>
+            <p>A shooting star just passed by</p>
+            <div class="wish-input-group">
+                <input type="text" id="wish-input" placeholder="What do you wish for?">
+                <button id="make-wish-btn">Make Wish ✨</button>
+            </div>
+        </div>
+    </div>
 
-    <div id="wish-confirmation" class="wish-modal-wrapper hidden"></div>
+    <div id="wish-confirmation" class="wish-modal-wrapper hidden">
+        <div class="wish-modal-content">
+            <div class="wish-icon large">✨</div>
+            <p class="large-text">Your wish has been sent to the stars</p>
+            <p>May it find its way to you</p>
+        </div>
+    </div>
 
-    <script src="script.js" defer></script>
+    <script src="script.js"></script>
 </body>
 </html>
