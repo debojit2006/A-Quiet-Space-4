@@ -1,0 +1,156 @@
+/* --- Design System & Global CSS --- */
+:root {
+    --background: oklch(0.145 0 0);
+    --foreground: oklch(0.985 0 0);
+    --primary: oklch(0.985 0 0);
+    --primary-foreground: oklch(0.205 0 0);
+    --border: oklch(0.269 0 0);
+    --radius: 0.625rem;
+    --font-size: 14px;
+    --font-weight-medium: 500;
+}
+
+/* --- Base Styles --- */
+* { box-sizing: border-box; border-color: var(--border); }
+html { font-size: var(--font-size); }
+body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* --- Main Layout --- */
+.app-container { min-height: 100vh; background: linear-gradient(to bottom right, #0f172a, #300a24, #0f172a); position: relative; overflow: hidden; }
+.content-wrapper { position: relative; z-index: 10; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1rem; text-align: center; }
+.main-content-area { max-width: 56rem; width: 100%; margin: auto; display: flex; flex-direction: column; gap: 2rem; }
+
+/* --- Typography (Mobile Friendly) --- */
+h1 { font-size: clamp(2rem, 6vw, 2.5rem); line-height: 1.2; color: rgba(255, 255, 255, 0.9); }
+p { font-size: clamp(1rem, 4vw, 1.125rem); line-height: 1.5; color: rgba(255, 255, 255, 0.7); max-width: 32rem; margin: auto; }
+
+/* --- Feature & Button Layout --- */
+.feature-display-area { min-height: 280px; display: flex; align-items: center; justify-content: center; width: 100%; transition: opacity 0.5s ease; }
+.feature-display-area.fade-out { opacity: 0; }
+.feature-container { width: 100%; }
+.initial-message, .environment-instructions { color: rgba(255, 255, 255, 0.6); font-size: clamp(0.9rem, 3vw, 1.125rem); padding: 0 1rem; }
+.action-buttons-wrapper { display: flex; flex-direction: column; gap: 1.5rem; }
+.action-buttons { display: flex; justify-content: center; align-items: center; width: 100%; gap: 1rem; }
+.main-activities { flex-flow: column wrap; }
+.environment-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+@media (min-width: 640px) { .main-activities { flex-direction: row; } .environment-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 1024px) { .environment-grid { grid-template-columns: repeat(6, 1fr); } }
+.environment-selection { display: flex; flex-direction: column; gap: 0.75rem; }
+.env-selection-label { font-size: 0.875rem; color: rgba(255, 255, 255, 0.6); margin: 0; }
+
+/* --- Buttons --- */
+.feature-btn {
+    display: inline-flex; align-items: center; justify-content: center; white-space: nowrap; border-radius: var(--radius);
+    font-size: 0.875rem; font-weight: var(--font-weight-medium); padding: 0.5rem 1rem; width: 100%; cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.1); color: var(--foreground); border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease; backdrop-filter: blur(4px);
+}
+.feature-btn.lg { font-size: 1rem; padding: 0.75rem 1.5rem; }
+.feature-btn:hover { background-color: rgba(255, 255, 255, 0.2); border-color: rgba(255, 255, 255, 0.3); }
+.feature-btn.active { background-color: var(--primary); color: var(--primary-foreground); border-color: var(--primary); }
+.feature-btn svg { width: 1rem; height: 1rem; margin-right: 0.5rem; }
+.feature-btn.lg svg { width: 1.25rem; height: 1.25rem; }
+
+/* --- Utility & Transitions --- */
+.hidden { display: none !important; }
+
+/* --- Feature-Specific Styles --- */
+.breathing-animation, .kind-words-display, .focus-timer { display: flex; flex-direction: column; align-items: center; gap: 2rem; width: 100%; }
+
+/* Breathing */
+.breathing-circle-container { position: relative; width: min(70vw, 16rem); height: min(70vw, 16rem); display: flex; align-items: center; justify-content: center; }
+#breathing-circle { width: 50%; height: 50%; border-radius: 50%; background: linear-gradient(to bottom right, #3b82f6, #a855f7); opacity: 0.5; border: 1px solid rgba(255, 255, 255, 0.2); backdrop-filter: blur(4px); transition-property: transform; transition-timing-function: ease-in-out; }
+#breathing-instructions { font-size: clamp(1rem, 5vw, 1.5rem); color: rgba(255, 255, 255, 0.8); transition: opacity 0.5s ease; }
+.fade-out { opacity: 0; }
+
+/* Kind Words */
+.quote-display-wrapper { min-height: 150px; display: flex; align-items: center; justify-content: center; }
+#kind-word-text { font-size: clamp(1.2rem, 5vw, 1.5rem); line-height: 1.4; color: rgba(255, 255, 255, 0.9); padding: 0 2.5rem; position: relative; transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out; }
+#kind-word-text::before, #kind-word-text::after { position: absolute; font-size: clamp(2.5rem, 10vw, 4rem); line-height: 1; color: rgba(255, 255, 255, 0.2); }
+#kind-word-text::before { content: '“'; top: -0.5rem; left: 0; }
+#kind-word-text::after { content: '”'; bottom: -1.5rem; right: 0; }
+#another-word-btn .refresh-icon { transition: transform 0.5s ease; }
+#another-word-btn.refreshing .refresh-icon { transform: rotate(360deg); }
+
+/* Focus Timer */
+.timer-header { text-align: center; }
+.timer-badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 9999px; backdrop-filter: blur(4px); }
+.timer-badge svg { width: 1.25rem; height: 1.25rem; }
+.timer-circle-container { position: relative; width: min(65vw, 16rem); height: min(65vw, 16rem); }
+.timer-circle-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.timer-circle-bg { cx: 50; cy: 50; r: 45; stroke: rgba(255, 255, 255, 0.1); stroke-width: 2; fill: none; }
+.timer-circle-progress { cx: 50; cy: 50; r: 45; stroke-width: 3; fill: none; stroke-linecap: round; transition: stroke-dashoffset 0.5s ease-in-out; }
+.timer-display { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+#timer-time { font-size: clamp(2.5rem, 10vw, 3rem); color: rgba(255, 255, 255, 0.9); }
+#timer-status { font-size: 0.875rem; color: rgba(255, 255, 255, 0.6); }
+.timer-controls { display: flex; align-items: center; gap: 1rem; }
+.timer-mode-switcher { display: flex; gap: 0.5rem; }
+.timer-mode-switcher button { padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; background-color: rgba(255,255,255,0.05); color: rgba(255,255,255,0.6); border: none; cursor: pointer; transition: all 0.3s ease; }
+.timer-mode-switcher button.active { background-color: rgba(255,255,255,0.2); color: white; }
+
+/* --- Environment Base --- */
+.environment-container { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 1; }
+.will-change { will-change: transform, opacity; }
+
+/* Night Sky */
+.star { animation-name: twinkle; }
+.shooting-star { animation-name: shoot-advanced; }
+.shooting-star-trail { width: 5rem; height: 1px; background: linear-gradient(to right, white, transparent); position: absolute; top: 50%; left: 50%; transform-origin: left center; animation: trail-fade 2s ease-out; }
+.galaxy-particle { animation-name: twinkle; }
+.nebula-cloud { filter: blur(1.5rem); }
+@keyframes twinkle { 0%, 100% { opacity: var(--start-opacity); transform: scale(1); } 50% { opacity: calc(var(--start-opacity) * 0.3); transform: scale(1.2); } }
+@keyframes shoot-advanced { 0% { transform: var(--start-pos) scale(1); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: var(--end-pos) scale(0.5); opacity: 0; } }
+@keyframes trail-fade { 0% { transform: scaleX(0); } 10% { transform: scaleX(1); } 70% { transform: scaleX(1); } 100% { transform: scaleX(0); } }
+
+/* Mountains */
+.mountains-container svg { position: absolute; bottom: 0; width: 100%; height: auto; }
+.mountain-cloud, .beach-cloud { background-color: white; border-radius: 50%; animation-name: drift; animation-timing-function: linear; animation-iteration-count: infinite; }
+.mountain-bird { color: rgba(255, 255, 255, 0.4); animation-name: fly; animation-timing-function: linear; animation-iteration-count: infinite; }
+@keyframes drift { from { transform: translateX(-20vw); } to { transform: translateX(120vw); } }
+@keyframes fly { from { transform: translateX(-10vw); } to { transform: translateX(110vw); } }
+
+/* Beach */
+.beach-container .sun { position: absolute; top: 5rem; right: 6rem; width: 5rem; height: 5rem; border-radius: 50%; background: linear-gradient(to bottom right, #fef08a, #fb923c); opacity: 0.7; animation: pulse 5s ease-in-out infinite; }
+.wave { animation-name: wave-bob; }
+.wave path { animation-name: wave-morph; }
+.seagull { color: rgba(255, 255, 255, 0.6); animation-name: fly; }
+@keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.7; } 50% { transform: scale(1.05); opacity: 0.8; } }
+@keyframes wave-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+@keyframes wave-morph { 0%, 100% { d: path("M0,50 Q300,20 600,50 T1200,50 L1200,100 L0,100 Z"); } 50% { d: path("M0,50 Q300,80 600,50 T1200,50 L1200,100 L0,100 Z"); } }
+
+/* Gentle Rain */
+.raindrop { animation-name: fall; }
+.lightning-flash { animation: flash 0.3s ease-out; }
+@keyframes fall { from { transform: translateY(-10vh); } to { transform: translateY(110vh); } }
+@keyframes flash { 0% { opacity: 0; } 25% { opacity: 0.3; } 50% { opacity: 0.1; } 100% { opacity: 0; } }
+
+/* Fireplace */
+.flame { animation-name: flicker; }
+.ember { animation-name: glow; }
+.spark { animation-name: rise; }
+@keyframes flicker { 0%, 100% { transform: scale(1, 1); opacity: 0.8; } 50% { transform: scale(1.1, 0.8); opacity: 1; } }
+@keyframes glow { 0%, 100% { opacity: 0.7; transform: scale(1); } 50% { opacity: 1; transform: scale(1.1); } }
+@keyframes rise { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-80vh) translateX(var(--x-end)); opacity: 0; } }
+
+/* Wish Modal */
+.wish-modal-wrapper { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; pointer-events: auto; background-color: rgba(0,0,0,0.3); backdrop-filter: blur(2px); opacity: 0; transition: opacity 0.3s ease; padding: 1rem; }
+.wish-modal-wrapper:not(.hidden) { opacity: 1; }
+.wish-modal-content { background-color: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 0.5rem; padding: 1.5rem; text-align: center; border: 1px solid rgba(255, 255, 255, 0.2); display: flex; flex-direction: column; gap: 1rem; transform: scale(0.95); transition: transform 0.3s ease; width: 100%; max-width: 350px; }
+.wish-modal-wrapper:not(.hidden) .wish-modal-content { transform: scale(1); }
+.wish-icon { font-size: 1.875rem; }
+.wish-icon.large { font-size: 2.25rem; }
+.wish-modal-content h3 { font-size: 1.25rem; color: rgba(255, 255, 255, 0.9); margin: 0; }
+.wish-modal-content p { font-size: 0.875rem; color: rgba(255, 255, 255, 0.7); margin: 0; }
+.wish-modal-content p.large-text { font-size: 1rem; color: rgba(255,255,255,0.9); }
+.wish-input-group { display: flex; flex-direction: column; gap: 0.75rem; }
+#wish-input { width: 100%; padding: 0.75rem; background-color: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 0.25rem; color: white; placeholder-color: rgba(255, 255, 255, 0.5); font-size: 1rem; }
+#wish-input:focus { outline: none; border-color: rgba(255, 255, 255, 0.4); }
+#make-wish-btn { padding: 0.75rem 1rem; background-color: rgba(255, 255, 255, 0.2); border: none; border-radius: 0.25rem; color: white; cursor: pointer; transition: background-color 0.2s; font-size: 1rem; }
+#make-wish-btn:hover { background-color: rgba(255, 255, 255, 0.3); }
