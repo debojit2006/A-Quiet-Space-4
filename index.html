@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Quiet Space</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="app-container" class="app-container">
+        <div class="content-wrapper">
+            <div class="main-content-area">
+                <header>
+                    <h1>A Quiet Space</h1>
+                    <p>This space is just for you. A quiet place when the world is too loud.</p>
+                </header>
+
+                <div id="feature-display-area" class="feature-display-area">
+                    <div id="initial-message" class="initial-message">
+                        Choose an activity or an environment to find your peace
+                    </div>
+
+                    <div id="breathing-feature" class="feature-container hidden"></div>
+
+                    <div id="kind-words-feature" class="feature-container hidden"></div>
+                    
+                    <div id="focus-timer-feature" class="feature-container hidden"></div>
+
+                    <div id="environment-instructions" class="environment-instructions hidden">
+                        <p id="environment-text"></p>
+                    </div>
+                </div>
+
+                <div class="action-buttons-wrapper">
+                    <div class="action-buttons main-activities">
+                        <button id="breathe-btn" class="feature-btn lg" data-feature="breathing">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10Z"/><path d="M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z"/></svg>
+                            <span>Breathe</span>
+                        </button>
+                        <button id="words-btn" class="feature-btn lg" data-feature="words">
+                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                            <span>Kind Words</span>
+                        </button>
+                        <button id="timer-btn" class="feature-btn lg" data-feature="timer">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            <span>Focus Timer</span>
+                        </button>
+                    </div>
+
+                    <div class="environment-selection">
+                        <p class="env-selection-label">Choose your peaceful environment</p>
+                        <div class="action-buttons environment-grid">
+                            <button class="feature-btn" data-environment="sky">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+                                <span>Night Sky</span>
+                            </button>
+                             <button class="feature-btn" data-environment="mountains">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg>
+                                <span>Mountains</span>
+                            </button>
+                            <button class="feature-btn" data-environment="beach">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12c.83-.3 1.5-.67 2.33-1S6.5 10.33 7.33 10c.83-.33 1.5-.67 2.34-1 .83-.33 1.5-.67 2.33-1"/><path d="M21 12c-.83-.3-1.5-.67-2.33-1s-1.5-.33-2.34-1c-.83-.33-1.5-.67-2.33-1s-1.5-.67-2.33-1"/><path d="M3 6c.83-.3 1.5-.67 2.33-1S6.5 4.33 7.33 4c.83-.33 1.5-.67 2.34-1 .83-.33 1.5-.67 2.33-1"/><path d="M21 6c-.83-.3-1.5-.67-2.33-1s-1.5-.33-2.34-1c-.83-.33-1.5-.67-2.33-1s-1.5-.67-2.33-1"/><path d="M3 18c.83-.3 1.5-.67 2.33-1S6.5 16.33 7.33 16c.83-.33 1.5-.67 2.34-1 .83-.33 1.5-.67 2.33-1"/><path d="M21 18c-.83-.3-1.5-.67-2.33-1s-1.5-.33-2.34-1c-.83-.33-1.5-.67-2.33-1s-1.5-.67-2.33-1"/></svg>
+                                <span>Beach</span>
+                            </button>
+                            <button class="feature-btn" data-environment="rain">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M16 14v6"/><path d="M8 14v6"/><path d="M12 16v6"/></svg>
+                                <span>Gentle Rain</span>
+                            </button>
+                            <button class="feature-btn" data-environment="forest">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 10.3c.2-.4.5-.8.9-1a2.4 2.4 0 0 1 2.5 1.3 2.4 2.4 0 0 1-1.3 3.4 2.5 2.5 0 0 1-3.4-1.3 2.4 2.4 0 0 1 .1-2.4Z"/><path d="M14.2 14.2c.4.2.8.5 1 .9a2.4 2.4 0 0 1-1.3 3.4 2.5 2.5 0 0 1-3.4-1.3 2.4 2.4 0 0 1 2.4-.1 2.4 2.4 0 0 1 1.3-2.9Z"/><path d="M12 22v-2"/><path d="M12 6V4"/><path d="m15 9.09 1-1.73"/><path d="m9 15-.9-1.56"/><path d="m20.66 18-1.73-1"/><path d="m3.34 6 1.73 1"/><path d="M18 15.91l1.73 1"/><path d="m6 9-1.73-1"/><path d="M9.09 9 7.36 8"/><path d="m15 15 .9 1.56"/><path d="M6.34 18 4.6 17"/><path d="M17.66 6 15.92 7"/></svg>
+                                <span>Forest</span>
+                            </button>
+                            <button class="feature-btn" data-environment="fireplace">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12c0-2.8.9-5.3 2.4-7.3"/><path d="M12 12c0 6.4 4.1 10 4.1 10-2.3 0-4.1-3.6-4.1-10Z"/><path d="M12 12c0-6.4-4.1-10-4.1-10 2.3 0 4.1 3.6 4.1 10Z"/><path d="M5 19c0-1.4 1-2.6 2.4-3.1"/><path d="M19 19c0-1.4-1-2.6-2.4-3.1"/></svg>
+                                <span>Fireplace</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="wish-prompt" class="wish-modal-wrapper hidden"></div>
+
+    <div id="wish-confirmation" class="wish-modal-wrapper hidden"></div>
+
+    <script src="script.js" defer></script>
+</body>
+</html>
