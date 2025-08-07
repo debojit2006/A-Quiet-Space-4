@@ -1,369 +1,431 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- STATE ---
-    let activeFeature = null;
+    let activeFeature = null; // 'breathing', 'words', 'timer', or 'environment'
     let activeEnvironment = 'sky';
-    let timers = {
-        breathing: null,
-        environment: [],
-        focus: null
-    };
+    let intervals = [];
     const isMobile = window.innerWidth < 768;
 
-    // --- DOM ELEMENT REFERENCES ---
+    // --- DOM ELEMENTS ---
     const appContainer = document.getElementById('app-container');
-    const featureDisplayArea = document.getElementById('feature-display-area');
+    const featureBtns = document.querySelectorAll('[data-feature]');
+    const envBtns = document.querySelectorAll('[data-environment]');
+    
     const initialMessage = document.getElementById('initial-message');
     const envInstructions = document.getElementById('environment-instructions');
     const envInstructionsText = document.getElementById('environment-text');
 
-    // Feature Containers
-    const featureContainers = {
+    const featureDisplayArea = document.getElementById('feature-display-area');
+    const allFeatures = {
         breathing: document.getElementById('breathing-feature'),
         words: document.getElementById('kind-words-feature'),
-        timer: document.getElementById('focus-timer-feature')
+        timer: document.getElementById('focus-timer-feature'),
     };
-    
-    // Buttons
-    const featureBtns = document.querySelectorAll('[data-feature]');
-    const envBtns = document.querySelectorAll('[data-environment]');
-    
-    // --- TEMPLATES ---
-    const templates = {
-        breathing: `
-            <div class="breathing-animation">
-                <div class="breathing-circle-container"><div id="breathing-circle"></div></div>
-                <p id="breathing-instructions">Find your rhythm</p>
-            </div>`,
-        words: `
-            <div class="kind-words-display">
-                <div class="quote-display-wrapper"><p id="kind-word-text"></p></div>
-                <button id="another-word-btn" class="feature-btn lg">
-                    <svg class="refresh-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M3 12a9 9 0 0 1 9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>
-                    <span>Another word</span>
-                </button>
-            </div>`,
-        timer: `
-            <div class="focus-timer">
-                <div class="timer-header">
-                    <div id="timer-badge" class="timer-badge"><span id="timer-title">Focus Time</span></div>
-                </div>
-                <div class="timer-circle-container">
-                    <svg class="timer-circle-svg" viewBox="0 0 100 100">
-                        <circle class="timer-circle-bg"/>
-                        <circle id="timer-progress" class="timer-circle-progress" pathLength="100"/>
-                    </svg>
-                    <div class="timer-display">
-                        <div id="timer-time">25:00</div>
-                        <div id="timer-status">Ready</div>
-                    </div>
-                </div>
-                <div class="timer-controls">
-                    <button id="timer-start-pause" class="feature-btn lg">Start</button>
-                    <button id="timer-reset" class="feature-btn">Reset</button>
-                </div>
-                <div class="timer-mode-switcher">
-                    <button data-mode="work" class="active">Work</button>
-                    <button data-mode="shortBreak">Short Break</button>
-                    <button data-mode="longBreak">Long Break</button>
-                </div>
-            </div>`,
-        wishPrompt: `
-            <div class="wish-modal-content">
-                <div class="wish-icon">🌟</div><h3>Make a Wish!</h3>
-                <p>A shooting star just passed by</p>
-                <div class="wish-input-group">
-                    <input type="text" id="wish-input" placeholder="What do you wish for?">
-                    <button id="make-wish-btn">Make Wish ✨</button>
-                </div>
-            </div>`,
-        wishConfirmation: `
-            <div class="wish-modal-content">
-                <div class="wish-icon large">✨</div>
-                <p class="large-text">Your wish has been sent to the stars</p>
-                <p>May it find its way to you</p>
-            </div>`
-    };
+
+    // Breathing Elements
+    const breathingCircle = document.getElementById('breathing-circle');
+    const breathingInstructions = document.getElementById('breathing-instructions');
+
+    // Kind Words Elements
+    const kindWordText = document.getElementById('kind-word-text');
+    const anotherWordBtn = document.getElementById('another-word-btn');
+
+    // Focus Timer Elements
+    const timerTimeLeft = document.getElementById('timer-time-left');
+    const timerProgressRingFg = document.getElementById('timer-progress-ring-fg');
+    const timerStartPauseBtn = document.getElementById('timer-start-pause-btn');
+    const timerStartPauseText = document.getElementById('timer-start-pause-text');
+    const timerPlayIcon = timerStartPauseBtn.querySelector('.play-icon');
+    const timerPauseIcon = timerStartPauseBtn.querySelector('.pause-icon');
+    const timerResetBtn = document.getElementById('timer-reset-btn');
+    const timerModeSwitcher = document.getElementById('timer-mode-switcher');
+    const timerModeStatus = document.getElementById('timer-mode-status');
+
+    // Wish Modal Elements
+    const wishPrompt = document.getElementById('wish-prompt');
+    const wishConfirmation = document.getElementById('wish-confirmation');
+    const makeWishBtn = document.getElementById('make-wish-btn');
+    const wishInput = document.getElementById('wish-input');
+
+    const kindWords = ["You’re not just studying Computer Science, you’re rewriting your own future with every line of code.", "I see how hard you work, and it inspires me every single day.", "You carry so much strength in your silence and so much fire in your focus.", "Behind every sleepless night, there's a brighter tomorrow waiting just for you.", "Your dedication isn’t ordinary—it’s rare, powerful, and beautiful.", "The world needs more minds like yours—sharp, sincere, and kind.", "Keep going, even when it’s tough—you're closer to your goals than you think.", "Your grind today is the glow-up the future will thank you for.", "You might feel overwhelmed now, but one day you’ll look back and smile at how far you’ve come.", "I know it’s not easy, but I also know you were never meant for the easy path—you were made for greatness.", "You're not just studying code, you're building the foundation for your dreams.", "Every bug you fix, every concept you master is one more proof of how capable you are.", "Don’t let stress make you forget how brilliant you are.", "Even on your worst days, you’re doing more than enough.", "The late nights, the frustration, the doubt—it’s all part of your powerful journey.", "I know it’s exhausting sometimes, but you’re stronger than anything life throws at you.", "You’re not behind—you’re blooming in your own time.", "It's okay to rest, but never forget the fire that made you start.", "You’ve come too far to not be proud of yourself.", "There’s something extraordinary about the way you never give up.", "Not everyone sees how hard you work—but I do, and it amazes me.", "You’re writing your own success story—one challenge at a time.", "Your ambition is magnetic, and your energy is something rare.", "You’re the kind of person who turns stress into strength.", "The way you manage everything—even when it's hard—is a quiet kind of heroism.", "Your mind is powerful, but your heart makes it even more incredible.", "Remember: pressure turns coal into diamonds—and you’re already sparkling.", "You’re not just going through it—you’re growing through it.", "If only you could see yourself through my eyes—you'd see someone unstoppable.", "There’s magic in your persistence. Don’t ever let it fade.", "You’ve got the kind of grit that changes lives—starting with your own.", "Take breaks, but never break down—you’re too brilliant to quit.", "I believe in your journey, even on the days you don’t.", "You’re not meant to be perfect—only persistent.", "When you’re tired, let your dreams rest—but never let them die.", "There’s no shortcut to success, but I see you building the whole road yourself.", "You’re not behind—you’re learning what most never dare to.", "The hard work you’re doing today is shaping a life full of possibilities.", "Some people study; you transform every lesson into power.", "No algorithm can calculate the brilliance of your determination.", "Even machines would admire your logic and your heart.", "Your strength is not in always having the answers, but in never being afraid to seek them.", "I know you’re tired, but that spark in your eyes is still there.", "You’re a storm of intelligence, kindness, and resilience.", "Keep showing up, even when it’s hard—especially then.", "What you’re building matters. You matter.", "When things get hard, remember who you are and why you started.", "I’m proud of your ambition and grateful to know someone so driven.", "Your dreams aren’t just dreams—they’re blueprints for a future only you can build.", "Keep being you—brilliant, hardworking, and truly one of a kind."];
+    let currentWordIndex = 0;
 
     // --- RENDER & STATE MANAGEMENT ---
-    function switchFeature(newFeature) {
-        const oldFeature = activeFeature;
-        if (oldFeature === newFeature) {
-            activeFeature = null;
-        } else {
-            activeFeature = newFeature;
-        }
-        render();
-    }
-
     function render() {
-        // --- Cleanup old state ---
         stopAllAnimations();
-        Object.values(featureContainers).forEach(c => { c.classList.add('hidden'); c.innerHTML = ''; });
         initialMessage.classList.add('hidden');
         envInstructions.classList.add('hidden');
-        featureDisplayArea.classList.add('fade-out');
+        Object.values(allFeatures).forEach(el => el.classList.add('hidden'));
 
-        // --- Update button active states ---
-        featureBtns.forEach(b => b.classList.toggle('active', b.dataset.feature === activeFeature));
-        envBtns.forEach(b => b.classList.toggle('active', activeFeature === 'environment' && b.dataset.environment === activeEnvironment));
+        document.querySelectorAll('.feature-btn').forEach(b => b.classList.remove('active'));
         
-        // --- Render new state ---
-        setTimeout(() => {
-            if (activeFeature) {
-                const container = featureContainers[activeFeature];
-                if(container) {
-                    container.innerHTML = templates[activeFeature];
-                    container.classList.remove('hidden');
-                    // Initialize the new feature's logic
-                    if (activeFeature === 'breathing') initBreathingAnimation();
-                    if (activeFeature === 'words') initKindWords();
-                    if (activeFeature === 'timer') initFocusTimer();
-                } else if (activeFeature === 'environment') {
-                    envInstructions.classList.remove('hidden');
-                    startEnvironment(activeEnvironment);
-                }
-            } else {
-                initialMessage.classList.remove('hidden');
-            }
-            featureDisplayArea.classList.remove('fade-out');
-        }, 300); // Wait for fade-out to complete
+        if (activeFeature && allFeatures[activeFeature]) {
+            document.querySelector(`[data-feature="${activeFeature}"]`).classList.add('active');
+            allFeatures[activeFeature].classList.remove('hidden');
+            if (activeFeature === 'breathing') startBreathingAnimation();
+            if (activeFeature === 'words') showNewKindWord();
+            if (activeFeature === 'timer') initializeTimer();
+        } else if (activeFeature === 'environment') {
+            document.querySelector(`[data-environment="${activeEnvironment}"]`).classList.add('active');
+            envInstructions.classList.remove('hidden');
+            startEnvironment(activeEnvironment);
+        } else {
+            initialMessage.classList.remove('hidden');
+        }
     }
 
     function stopAllAnimations() {
-        Object.values(timers).forEach(timer => {
-            if (Array.isArray(timer)) timer.forEach(clearInterval);
-            else clearInterval(timer);
-        });
-        timers.environment = [];
+        intervals.forEach(clearInterval);
+        intervals = [];
         const envContainer = document.querySelector('.environment-container');
         if (envContainer) envContainer.remove();
     }
     
     // --- EVENT LISTENERS ---
-    featureBtns.forEach(btn => btn.addEventListener('click', () => switchFeature(btn.dataset.feature)));
-    envBtns.forEach(btn => btn.addEventListener('click', () => {
-        activeEnvironment = btn.dataset.environment;
-        switchFeature('environment');
-    }));
-
-    // --- FEATURE INITIALIZERS ---
-    function initBreathingAnimation() {
-        const circle = document.getElementById('breathing-circle');
-        const instructions = document.getElementById('breathing-instructions');
-        if (!circle || !instructions) return;
-        const cycle = [ { text: 'Breathe in slowly...', scale: 1.5, duration: 4000 }, { text: 'Hold...', scale: 1.5, duration: 2000 }, { text: 'Breathe out gently...', scale: 0.8, duration: 6000 }, { text: 'Rest...', scale: 0.8, duration: 2000 } ];
-        const totalCycleTime = cycle.reduce((sum, p) => sum + p.duration, 0);
-        let phaseIndex = 0;
-        
-        function runPhase() {
-            const { text, scale, duration } = cycle[phaseIndex];
-            instructions.style.opacity = '0';
-            setTimeout(() => { instructions.textContent = text; instructions.style.opacity = '1'; }, 500);
-            circle.style.transitionDuration = `${duration / 1000}s`;
-            circle.style.transform = `scale(${scale})`;
-            phaseIndex = (phaseIndex + 1) % cycle.length;
-        }
-
-        function schedule() {
-            let cumulativeTime = 0;
-            cycle.forEach(phase => {
-                setTimeout(runPhase, cumulativeTime);
-                cumulativeTime += phase.duration;
-            });
-        }
-        schedule();
-        timers.breathing = setInterval(schedule, totalCycleTime);
-    }
-
-    function initKindWords() {
-        const textEl = document.getElementById('kind-word-text');
-        const buttonEl = document.getElementById('another-word-btn');
-        if (!textEl || !buttonEl) return;
-        const kindWords = [ "You’re not just studying Computer Science, you’re rewriting your own future with every line of code.", "I see how hard you work, and it inspires me every single day.", "You carry so much strength in your silence and so much fire in your focus.", "Behind every sleepless night, there's a brighter tomorrow waiting just for you.", "Your dedication isn’t ordinary—it’s rare, powerful, and beautiful.", "The world needs more minds like yours—sharp, sincere, and kind.", "Keep going, even when it’s tough—you're closer to your goals than you think.", "Your grind today is the glow-up the future will thank you for.", "You might feel overwhelmed now, but one day you’ll look back and smile at how far you’ve come.", "I know it’s not easy, but I also know you were never meant for the easy path—you were made for greatness.", "You're not just studying code, you're building the foundation for your dreams.", "Every bug you fix, every concept you master is one more proof of how capable you are.", "Don’t let stress make you forget how brilliant you are.", "Even on your worst days, you’re doing more than enough.", "The late nights, the frustration, the doubt—it’s all part of your powerful journey.", "I know it’s exhausting sometimes, but you’re stronger than anything life throws at you.", "You’re not behind—you’re blooming in your own time.", "It's okay to rest, but never forget the fire that made you start.", "You’ve come too far to not be proud of yourself.", "There’s something extraordinary about the way you never give up.", "Not everyone sees how hard you work—but I do, and it amazes me.", "You’re writing your own success story—one challenge at a time.", "Your ambition is magnetic, and your energy is something rare.", "You’re the kind of person who turns stress into strength.", "The way you manage everything—even when it's hard—is a quiet kind of heroism.", "Your mind is powerful, but your heart makes it even more incredible.", "Remember: pressure turns coal into diamonds—and you’re already sparkling.", "You’re not just going through it—you’re growing through it.", "If only you could see yourself through my eyes—you'd see someone unstoppable.", "There’s magic in your persistence. Don’t ever let it fade.", "You’ve got the kind of grit that changes lives—starting with your own.", "Take breaks, but never break down—you’re too brilliant to quit.", "I believe in your journey, even on the days you don’t.", "You’re not meant to be perfect—only persistent.", "When you’re tired, let your dreams rest—but never let them die.", "There’s no shortcut to success, but I see you building the whole road yourself.", "You’re not behind—you’re learning what most never dare to.", "The hard work you’re doing today is shaping a life full of possibilities.", "Some people study; you transform every lesson into power.", "No algorithm can calculate the brilliance of your determination.", "Even machines would admire your logic and your heart.", "Your strength is not in always having the answers, but in never being afraid to seek them.", "I know you’re tired, but that spark in your eyes is still there.", "You’re a storm of intelligence, kindness, and resilience.", "Keep showing up, even when it’s hard—especially then.", "What you’re building matters. You matter.", "When things get hard, remember who you are and why you started.", "I’m proud of your ambition and grateful to know someone so driven.", "Your dreams aren’t just dreams—they’re blueprints for a future only you can build.", "Keep being you—brilliant, hardworking, and truly one of a kind." ];
-        let currentIndex = -1;
-        function showNewWord() {
-            let newIndex;
-            do { newIndex = Math.floor(Math.random() * kindWords.length); } while (newIndex === currentIndex);
-            currentIndex = newIndex;
-            textEl.style.opacity = 0; textEl.style.transform = 'translateY(20px)';
-            setTimeout(() => { textEl.textContent = kindWords[currentIndex]; textEl.style.opacity = 1; textEl.style.transform = 'translateY(0)'; }, 300);
-        }
-        buttonEl.addEventListener('click', () => {
-            if (buttonEl.classList.contains('refreshing')) return;
-            buttonEl.classList.add('refreshing');
-            showNewWord();
-            setTimeout(() => buttonEl.classList.remove('refreshing'), 500);
+    featureBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const feature = btn.dataset.feature;
+            activeFeature = activeFeature === feature ? null : feature;
+            render();
         });
-        showNewWord();
-    }
+    });
 
-    function initFocusTimer() {
-        // A simplified but functional version of the Pomodoro timer
-        const settings = { work: 25 * 60, shortBreak: 5 * 60, longBreak: 15 * 60 };
-        let state = { mode: 'work', timeLeft: settings.work, totalTime: settings.work, status: 'idle' };
-
-        const timeEl = document.getElementById('timer-time');
-        const statusEl = document.getElementById('timer-status');
-        const progressEl = document.getElementById('timer-progress');
-        const startPauseBtn = document.getElementById('timer-start-pause');
-        const resetBtn = document.getElementById('timer-reset');
-        const modeSwitcher = document.querySelector('.timer-mode-switcher');
-        const badgeEl = document.getElementById('timer-badge');
-
-        function updateDisplay() {
-            const minutes = Math.floor(state.timeLeft / 60).toString().padStart(2, '0');
-            const seconds = (state.timeLeft % 60).toString().padStart(2, '0');
-            timeEl.textContent = `${minutes}:${seconds}`;
-            statusEl.textContent = state.status.charAt(0).toUpperCase() + state.status.slice(1);
-            startPauseBtn.textContent = state.status === 'running' ? 'Pause' : 'Start';
-            const progress = (state.totalTime - state.timeLeft) / state.totalTime * 100;
-            progressEl.style.strokeDasharray = "100";
-            progressEl.style.strokeDashoffset = 100 - progress;
-            badgeEl.style.background = state.mode === 'work' ? 'rgba(59, 130, 246, 0.2)' : 'rgba(16, 185, 129, 0.2)';
-            progressEl.style.stroke = state.mode === 'work' ? '#3b82f6' : '#10b981';
-        }
-
-        function tick() {
-            if (state.timeLeft > 0) {
-                state.timeLeft--;
-                updateDisplay();
-            } else {
-                clearInterval(timers.focus);
-                timers.focus = null;
-                switchMode(state.mode === 'work' ? 'shortBreak' : 'work');
-            }
-        }
-
-        function toggleTimer() {
-            if (state.status === 'running') { // Pause
-                state.status = 'paused';
-                clearInterval(timers.focus);
-                timers.focus = null;
-            } else { // Start or Resume
-                state.status = 'running';
-                timers.focus = setInterval(tick, 1000);
-            }
-            updateDisplay();
-        }
-
-        function resetTimer() {
-            clearInterval(timers.focus);
-            timers.focus = null;
-            state.status = 'idle';
-            state.timeLeft = state.totalTime;
-            updateDisplay();
-        }
-
-        function switchMode(newMode) {
-            clearInterval(timers.focus);
-            timers.focus = null;
-            state = { mode: newMode, timeLeft: settings[newMode], totalTime: settings[newMode], status: 'idle' };
-            modeSwitcher.querySelector('.active').classList.remove('active');
-            modeSwitcher.querySelector(`[data-mode="${newMode}"]`).classList.add('active');
-            updateDisplay();
-        }
-
-        startPauseBtn.addEventListener('click', toggleTimer);
-        resetBtn.addEventListener('click', resetTimer);
-        modeSwitcher.addEventListener('click', (e) => {
-            if(e.target.dataset.mode) switchMode(e.target.dataset.mode);
+    envBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            activeEnvironment = btn.dataset.environment;
+            activeFeature = 'environment';
+            render();
         });
+    });
 
-        updateDisplay();
-    }
+    anotherWordBtn.addEventListener('click', () => {
+        if (anotherWordBtn.classList.contains('refreshing')) return;
+        anotherWordBtn.classList.add('refreshing');
+        showNewKindWord();
+        setTimeout(() => anotherWordBtn.classList.remove('refreshing'), 500);
+    });
     
-    // --- ENVIRONMENT GENERATORS ---
-    const envConfig = {
-        sky: { text: "Gaze at the galaxy and catch a shooting star to make a wish ✨", generator: startNightSky },
-        mountains: { text: "Breathe in the mountain air and watch the clouds drift by 🏔️", generator: startMountains },
-        beach: { text: "Listen to the gentle waves and watch the seagulls soar 🌊", generator: startBeach },
-        rain: { text: "Let the gentle rain wash your worries away 🌧️", generator: startGentleRain },
-        forest: { text: "Breathe in the fresh morning air and listen to nature's symphony 🌲", generator: startForestMorning },
-        fireplace: { text: "Warm yourself by the crackling fire and feel the cozy comfort 🔥", generator: startCracklingFireplace }
-    };
+    makeWishBtn.addEventListener('click', handleMakeWish);
+    wishInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') handleMakeWish();
+    });
 
-    function startEnvironment(envType) {
-        const config = envConfig[envType];
-        if (!config) return;
-
-        envInstructionsText.textContent = config.text;
-        const container = document.createElement('div');
-        container.className = `environment-container`;
-        config.generator(container);
-        appContainer.prepend(container);
-    }
-    
-    function createInFragment(count, creator) {
-        const fragment = document.createDocumentFragment();
-        for (let i = 0; i < count; i++) {
-            creator(fragment, i);
+    function handleMakeWish() {
+        if (wishInput.value.trim()) {
+            wishPrompt.classList.add('hidden');
+            wishConfirmation.classList.remove('hidden');
+            wishInput.value = '';
+            setTimeout(() => wishConfirmation.classList.add('hidden'), 3000);
         }
-        return fragment;
+    }
+
+    // --- UTILITY ---
+    function createAndAppend(parent, tag, className, styles = {}) {
+        const el = document.createElement(tag);
+        el.className = className;
+        Object.assign(el.style, styles);
+        parent.appendChild(el);
+        return el;
     }
 
     function addInterval(callback, duration) {
-        timers.environment.push(setInterval(callback, duration));
+        callback();
+        intervals.push(setInterval(callback, duration));
+    }
+    
+    function random(min, max) {
+        return Math.random() * (max - min) + min;
     }
 
-    function startNightSky(sky) {
-        const starCount = isMobile ? 75 : 200;
-        const galaxyCount = isMobile ? 50 : 100;
-        
-        sky.style.background = 'radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%)';
-        sky.appendChild(createInFragment(starCount, (frag) => {
-            const el = document.createElement('div');
-            el.className = 'star will-change';
-            Object.assign(el.style, { width: `${Math.random()*2+1}px`, height: `${Math.random()*2+1}px`, left: `${Math.random()*100}%`, top: `${Math.random()*100}%`, animationDuration: `${3+Math.random()*2}s`, animationDelay: `${Math.random()*5}s`, '--start-opacity': Math.random()*0.7+0.3 });
-            frag.appendChild(el);
-        }));
-        
-        addInterval(() => {
-            const startX = Math.random() * 100; const startY = Math.random() * 30;
-            const endX = Math.random() * 100; const endY = Math.random() * 30 + 70;
-            const star = document.createElement('div');
-            star.className = 'shooting-star will-change';
-            Object.assign(star.style, { '--start-pos': `translate(${startX}vw, ${startY}vh)`, '--end-pos': `translate(${endX}vw, ${endY}vh)` });
-            
-            const trail = document.createElement('div');
-            trail.className = 'shooting-star-trail';
-            star.appendChild(trail);
+    // --- FEATURE LOGIC ---
 
-            sky.appendChild(star);
-            setTimeout(() => star.remove(), 2000);
-            
-            const wishPrompt = document.getElementById('wish-prompt');
-            wishPrompt.innerHTML = templates.wishPrompt;
-            wishPrompt.classList.remove('hidden');
-            document.getElementById('make-wish-btn').onclick = handleMakeWish;
-            document.getElementById('wish-input').onkeypress = (e) => { if (e.key === 'Enter') handleMakeWish(); };
-            setTimeout(() => wishPrompt.classList.add('hidden'), 10000); // Increased duration
-        }, 12000);
+    function startBreathingAnimation() {
+        const cycle = [
+            { text: 'Breathe in slowly...', scale: 1.5, duration: 4000 },
+            { text: 'Hold...', scale: 1.5, duration: 2000 },
+            { text: 'Breathe out gently...', scale: 0.8, duration: 6000 },
+            { text: 'Rest...', scale: 0.8, duration: 2000 }
+        ];
+        let currentPhaseIndex = 0;
 
-        function handleMakeWish() {
-            const wishInput = document.getElementById('wish-input');
-            const wishConfirmation = document.getElementById('wish-confirmation');
-            if (wishInput.value.trim()) {
-                wishPrompt.classList.add('hidden');
-                wishConfirmation.innerHTML = templates.wishConfirmation;
-                wishConfirmation.classList.remove('hidden');
-                setTimeout(() => wishConfirmation.classList.add('hidden'), 3000);
+        function runCycle() {
+            const current = cycle[currentPhaseIndex];
+            breathingInstructions.classList.add('fade-out');
+            setTimeout(() => {
+                breathingInstructions.textContent = current.text;
+                breathingInstructions.classList.remove('fade-out');
+            }, 500);
+            breathingCircle.style.transitionDuration = `${current.duration / 1000}s`;
+            breathingCircle.style.transform = `scale(${current.scale})`;
+            currentPhaseIndex = (currentPhaseIndex + 1) % cycle.length;
+        }
+        
+        function schedulePhases() {
+            let cumulativeTime = 0;
+            cycle.forEach((phase, index) => {
+                setTimeout(() => runCycle(index), cumulativeTime);
+                cumulativeTime += phase.duration;
+            });
+        }
+        
+        schedulePhases();
+        const totalCycleTime = cycle.reduce((sum, p) => sum + p.duration, 0);
+        addInterval(schedulePhases, totalCycleTime);
+    }
+
+    function showNewKindWord() {
+        let newIndex;
+        do { newIndex = Math.floor(Math.random() * kindWords.length); } while (newIndex === currentWordIndex && kindWords.length > 1);
+        currentWordIndex = newIndex;
+        kindWordText.style.opacity = 0;
+        kindWordText.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+            kindWordText.textContent = kindWords[currentWordIndex];
+            kindWordText.style.opacity = 1;
+            kindWordText.style.transform = 'translateY(0)';
+        }, 300);
+    }
+    
+    // --- FOCUS TIMER LOGIC ---
+    let timerState = {
+        mode: 'work', // work, shortBreak, longBreak
+        status: 'idle', // idle, running, paused
+        timeLeft: 25 * 60,
+        totalTime: 25 * 60,
+        timerInterval: null
+    };
+    const timerSettings = { work: 25 * 60, shortBreak: 5 * 60, longBreak: 15 * 60 };
+    const radius = timerProgressRingFg.r.baseVal.value;
+    const circumference = radius * 2 * Math.PI;
+    timerProgressRingFg.style.strokeDasharray = `${circumference} ${circumference}`;
+
+    function updateTimerDisplay() {
+        const minutes = Math.floor(timerState.timeLeft / 60);
+        const seconds = timerState.timeLeft % 60;
+        timerTimeLeft.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        
+        const offset = circumference - (timerState.timeLeft / timerState.totalTime) * circumference;
+        timerProgressRingFg.style.strokeDashoffset = offset;
+        
+        timerModeStatus.textContent = {
+            'idle': 'Ready', 'running': 'In Progress', 'paused': 'Paused'
+        }[timerState.status];
+    }
+    
+    function startTimer() {
+        if (timerState.status === 'running') return;
+        timerState.status = 'running';
+        timerPauseIcon.classList.remove('hidden');
+        timerPlayIcon.classList.add('hidden');
+        timerStartPauseText.textContent = 'Pause';
+        
+        timerState.timerInterval = setInterval(() => {
+            timerState.timeLeft--;
+            updateTimerDisplay();
+            if (timerState.timeLeft <= 0) {
+                clearInterval(timerState.timerInterval);
+                timerState.status = 'idle';
+                // Switch modes automatically
+                const nextMode = timerState.mode === 'work' ? 'shortBreak' : 'work';
+                switchMode(nextMode);
             }
+        }, 1000);
+        addInterval(() => {}, 1000); // Add to master interval list for cleanup
+    }
+    
+    function pauseTimer() {
+        if (timerState.status !== 'running') return;
+        timerState.status = 'paused';
+        clearInterval(timerState.timerInterval);
+        timerPlayIcon.classList.remove('hidden');
+        timerPauseIcon.classList.add('hidden');
+        timerStartPauseText.textContent = 'Resume';
+    }
+    
+    function resetTimer() {
+        clearInterval(timerState.timerInterval);
+        timerState.status = 'idle';
+        timerState.timeLeft = timerSettings[timerState.mode];
+        timerState.totalTime = timerSettings[timerState.mode];
+        updateTimerDisplay();
+        timerPlayIcon.classList.remove('hidden');
+        timerPauseIcon.classList.add('hidden');
+        timerStartPauseText.textContent = 'Start';
+    }
+
+    function switchMode(newMode) {
+        timerState.mode = newMode;
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.mode === newMode);
+        });
+        resetTimer();
+    }
+
+    function initializeTimer() {
+        timerStartPauseBtn.onclick = () => {
+            if (timerState.status === 'running') pauseTimer();
+            else startTimer();
+        };
+        timerResetBtn.onclick = resetTimer;
+        timerModeSwitcher.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.onclick = () => switchMode(btn.dataset.mode);
+        });
+        resetTimer();
+    }
+
+
+    // --- ENVIRONMENT LOGIC ---
+    function startEnvironment(envType) {
+        const container = document.createElement('div');
+        container.className = `environment-container ${envType}-container`;
+        
+        const instructions = {
+            sky: "Gaze at the galaxy and catch a shooting star to make a wish ✨",
+            mountains: "Breathe in the mountain air and watch the clouds drift by 🏔️",
+            beach: "Listen to the gentle waves and watch the seagulls soar 🌊",
+            rain: "Let the gentle rain wash your worries away 🌧️",
+            forest: "Breathe in the fresh morning air and listen to nature's symphony 🌲",
+            fireplace: "Warm yourself by the crackling fire and feel the cozy comfort 🔥"
+        };
+        envInstructionsText.textContent = instructions[envType];
+
+        const envFunctions = { sky: startNightSky, mountains: startMountains, beach: startBeach, rain: startGentleRain, forest: startForestMorning, fireplace: startCracklingFireplace };
+        if (envFunctions[envType]) {
+            envFunctions[envType](container);
+        }
+        appContainer.prepend(container);
+    }
+    
+    function startNightSky(container) {
+        const starCount = isMobile ? 75 : 200;
+        for (let i = 0; i < starCount; i++) {
+            createAndAppend(container, 'div', 'star', { 
+                width: `${random(1, 3)}px`, height: `${random(1, 3)}px`, 
+                left: `${random(0, 100)}%`, top: `${random(0, 100)}%`, 
+                animationDuration: `${random(3, 5)}s`, animationDelay: `${random(0, 5)}s`,
+                '--start-opacity': random(0.3, 1)
+            });
+        }
+        addInterval(() => {
+            const startX = random(10, 90);
+            const startY = random(5, 40);
+            const angle = random(110, 140);
+            const starEl = createAndAppend(container, 'div', 'shooting-star', {
+                left: `${startX}%`, top: `${startY}%`,
+                transform: `rotate(${angle}deg) scaleX(0)`
+            });
+            setTimeout(() => { starEl.remove(); }, 2000);
+
+            // Show wish prompt
+            wishPrompt.classList.remove('hidden');
+            setTimeout(() => wishPrompt.classList.add('hidden'), 8000); // 8 second duration
+        }, 12000);
+    }
+
+    function startMountains(container) {
+        container.innerHTML = `
+            <svg viewBox="0 0 1200 400" style="height: 66.7%; fill: rgba(147, 197, 253, 0.3);"><path d="M0,400 L0,200 Q150,120 300,160 Q450,200 600,140 Q750,80 900,120 Q1050,160 1200,100 L1200,400 Z"></path></svg>
+            <svg viewBox="0 0 1200 350" style="height: 60%; fill: rgba(99, 102, 241, 0.4);"><path d="M0,350 L0,250 Q100,180 250,220 Q400,260 550,200 Q700,140 850,180 Q1000,220 1200,160 L1200,350 Z"></path></svg>
+            <svg viewBox="0 0 1200 300" style="height: 50%; fill: rgba(79, 70, 229, 0.5);"><path d="M0,300 L0,280 Q120,200 280,240 Q440,280 600,220 Q760,160 920,200 Q1080,240 1200,180 L1200,300 Z"></path></svg>
+            <div style="position:absolute; bottom: 25%; left:0; width:100%; height:8rem; background: linear-gradient(to top, rgba(255,255,255,0.1), transparent);"></div>
+        `;
+        const cloudCount = isMobile ? 4 : 8;
+        for (let i = 0; i < cloudCount; i++) { 
+            createAndAppend(container, 'div', 'mountain-cloud', { width: `${random(20, 60)}vw`, height: `${random(5, 15)}vh`, left: `${random(0, 100)}vw`, top: `${random(10, 50)}%`, opacity: random(0.3, 0.7), animationDuration: `${random(40, 80)}s` }); 
         }
     }
 
-    // --- Other environment generators would be defined here similarly ---
-    // For brevity, the logic for Mountains, Beach, Rain, Forest, and Fireplace
-    // would follow the same pattern: create a fragment, populate it with elements,
-    // append it to the container, and set up intervals.
+    function startBeach(container) {
+        createAndAppend(container, 'div', 'ocean'); 
+        createAndAppend(container, 'div', 'sand'); 
+        createAndAppend(container, 'div', 'sun');
+        for (let i = 0; i < 4; i++) {
+            const wave = createAndAppend(container, 'svg', 'wave', { height: `${15-i*3}%`, zIndex: 10-i, animationDuration: `${random(4,6)}s`, animationDelay: `${i*0.5}s` });
+            wave.setAttribute('viewBox', '0 0 1200 100');
+            const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            path.style.fill = `rgba(59, 130, 246, ${0.3 - i * 0.05})`;
+            path.style.animation = `wave-morph ${random(4,6)}s ease-in-out infinite ${i*0.5}s`;
+            wave.appendChild(path);
+        }
+        const cloudCount = isMobile ? 3 : 6;
+        for (let i = 0; i < cloudCount; i++) { 
+            createAndAppend(container, 'div', 'beach-cloud', { width: `${random(15, 45)}vw`, height: `${random(4, 12)}vh`, left: `${random(0, 100)}vw`, top: `${random(5, 35)}%`, opacity: random(0.6, 1), animationDuration: `${random(60, 100)}s` }); 
+        }
+        addInterval(() => {
+            const seagull = createAndAppend(container, 'div', 'seagull', { top: `${random(15, 55)}%`, animationDuration: `${random(20, 30)}s` });
+            seagull.innerHTML = `<svg width="20" height="14" viewBox="0 0 20 14" fill="currentColor"><path d="M10 0C8 3 6 6 0 8c6 2 8 5 10 8 2-3 4-6 10-8-6-2-8-5-10-8z"/></svg>`;
+            setTimeout(() => seagull.remove(), 25000);
+        }, 10000);
+    }
+    
+    function startGentleRain(container) {
+        const dropCount = isMobile ? 50 : 150;
+        for(let i=0; i< dropCount; i++) {
+            createAndAppend(container, 'div', 'raindrop', {
+                left: `${random(0, 100)}%`,
+                animationDuration: `${random(0.5, 1.5)}s`,
+                animationDelay: `${random(0, 5)}s`
+            });
+        }
+    }
+    
+    function startForestMorning(container) {
+        const treeCount = isMobile ? 5 : 10;
+        const leafCount = isMobile ? 10 : 25;
+        for(let i=0; i < treeCount; i++) {
+            const height = random(30, 70);
+            const width = height * 0.6;
+            const left = random(0, 100 - (width / window.innerWidth * 100));
+            createAndAppend(container, 'div', 'tree-trunk', { width: `${width*0.1}px`, height: `${height*0.5}vh`, left: `${left + (width*0.45)/window.innerWidth * 100}%`, backgroundColor: '#4a2c2a' });
+            createAndAppend(container, 'div', 'tree-canopy', { width: `${width}px`, height: `${height}vh`, left: `${left}%`, bottom: `${height * 0.3}vh` });
+        }
+         for(let i=0; i < 8; i++) {
+            createAndAppend(container, 'div', 'sunbeam', {
+                left: `${random(0, 100)}%`,
+                width: `${random(2, 6)}%`,
+                transform: `skewX(${random(-15, 15)}deg)`,
+                animationDelay: `${random(0, 4)}s`
+            });
+        }
+        for(let i=0; i < leafCount; i++) {
+            const leaf = createAndAppend(container, 'div', 'leaf', {
+                left: `${random(0, 100)}%`,
+                fontSize: `${random(10, 20)}px`,
+                animationDuration: `${random(8, 15)}s`,
+                animationDelay: `${random(0, 10)}s`
+            });
+            leaf.innerHTML = '&#127809;'; // Leaf emoji
+        }
+    }
+    
+    function startCracklingFireplace(container) {
+        const structure = createAndAppend(container, 'div', 'fireplace-structure');
+        createAndAppend(structure, 'div', 'fireplace-back');
+        const logsContainer = createAndAppend(structure, 'div', '');
+        createAndAppend(logsContainer, 'div', 'log', { width: '80%', bottom: '1rem', left: '10%', transform: 'rotate(-2deg)'});
+        createAndAppend(logsContainer, 'div', 'log', { width: '70%', bottom: '2rem', left: '15%', transform: 'rotate(2deg)'});
 
-    function startMountains(container) { /* ... implementation ... */ }
-    function startBeach(container) { /* ... implementation ... */ }
-    function startGentleRain(container) { /* ... implementation ... */ }
-    function startForestMorning(container) { /* ... implementation ... */ }
-    function startCracklingFireplace(container) { /* ... implementation ... */ }
-
-    // Initial Render
+        const flameCount = isMobile ? 8 : 15;
+        for(let i = 0; i < flameCount; i++) {
+            createAndAppend(structure, 'div', 'flame', {
+                left: `${random(20, 80)}%`,
+                width: `${random(20, 50)}px`,
+                height: `${random(40, 100)}px`,
+                animationDelay: `${random(0, 1)}s`
+            });
+        }
+        addInterval(() => {
+            for(let i = 0; i < (isMobile ? 1 : 3); i++) {
+                const spark = createAndAppend(structure, 'div', 'spark', {
+                    left: `${random(40, 60)}%`,
+                    '--x-end': `${random(-50, 50)}px`
+                });
+                setTimeout(() => spark.remove(), 2000);
+            }
+        }, 500);
+    }
+    
+    // --- INITIAL RENDER ---
     activeFeature = 'environment';
     render();
 });
